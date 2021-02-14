@@ -662,9 +662,23 @@ SpotifyWebApi.prototype = {
     options,
     callback
   ) {
+    let uris = undefined;
+    if (options && options.uris) {
+      uris = '';
+      for (let i = 0; i < options.uris.length; i++) {
+        if (i)
+          uris += ',';
+        uris += options.uris[i];
+      }
+
+      options.uris = undefined;
+    }
+    console.log('uris:', uris);
     return WebApiRequest.builder(this.getAccessToken())
       .withPath('/v1/playlists/' + playlistId + '/tracks')
       .withHeaders({ 'Content-Type': 'application/json' })
+      // For some reason, URIs only works as a query parameter, not as part of the json request body like the documentation says.
+      .withQueryParameters({uris})
       .withBodyParameters(
         {
           range_start: rangeStart,
